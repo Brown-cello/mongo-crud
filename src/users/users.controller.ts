@@ -34,15 +34,15 @@ export class UsersController {
   @Patch(':id')
   @ApiOperation({summary:'update a specific user account'})
   @ApiResponse({status: 200,description:'user updated successfully'})
-  async updateUser(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  async updateUser(@Param('id') id: string, @Body() createUserDto: CreateUserDto) {
+    return this.usersService.update(id, createUserDto);
   }
 
   @Delete(':id')
   @ApiOperation({summary:'delete a specific user account'})
   @ApiResponse({status: 200,description:'user deleted successfully'})
   async removeUser(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+    return this.usersService.remove(id);
   }
   
   }
