@@ -10,7 +10,7 @@ export class User extends Document{
     username:string;
     
     @ApiProperty({example:15,description:"the age of the user"})
-    @Prop({ required:true ,unique:true} )
+    @Prop({ required:true } )
     age:number
     
     @ApiProperty({example:false,description:"this blocks the user the user"})

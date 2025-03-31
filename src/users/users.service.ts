@@ -4,17 +4,22 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User } from 'src/schemas/user.schema';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor( @InjectModel(User.name) private userModel:Model<User>){}
  async create(createUserDto: CreateUserDto) {
-  const newuser = await new this.userModel(createUserDto)
+ 
+
   try {
     const existingUser = await this.userModel.findOne({ username: createUserDto.username });
     if (existingUser) {
       throw new ConflictException('Username is already in use. Please choose another.');
     }
+    const salt = await bcrypt.genSalt(10);
+    createUserDto.password = await bcrypt.hash(createUserDto.password, salt);
+
     const newUser = new this.userModel(createUserDto);
    return await newUser.save();
   } catch (error) {
@@ -40,14 +45,14 @@ export class UsersService {
     return this.userModel.findOne({ email }).select('+password').exec();
   }
 
-  async findByPassword(password: string) {
-    return await this.userModel.findOne({ password } );
-}
+//   async findByPassword(password: string) {
+//     return await this.userModel.findOne({ password } );
+// }
 
   
 
- async update(id: string, updateUserDto: UpdateUserDto) {
-    const updateuser = await this.userModel.findOne({ where: { id } });
+ async update(id: string, createUserDto: CreateUserDto) {
+    const updateuser = await this.userModel.findById(id);
     if (!updateuser) {
       throw new NotFoundException(` record with ID ${id} not found`);
     }
@@ -71,10 +76,7 @@ async remove(id: string) {
   if (!result) {
     throw new NotFoundException(`Library record with ID ${id} not found`);
   
-  }
-
-  const newresult= await this.userModel.findByIdAndDelete(id)
-  
+  }  
 
   return { message: `Library record with ID ${id} deleted successfully`,
 
